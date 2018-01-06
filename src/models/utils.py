@@ -6,6 +6,7 @@ import time
 import random
 import csv
 import preprocess
+import copy
 from os.path import isdir
 from config import cfg
 
@@ -292,9 +293,10 @@ def save_grid_search_log_with_glv_to_csv(idx, log_path, loss_train_w_mean, loss_
 
 
 # Save Boost Round Log to csv File
-def save_boost_round_log_to_csv(model_name, boost_round_log_path, boost_round_log_upper_path, csv_idx, idx_round,
-                                valid_loss_round_mean, train_loss_round_mean, train_seed, cv_seed,
-                                parameters, param_name_list, param_value_list, param_name):
+def save_boost_round_log_to_csv(model_name, boost_round_log_path, boost_round_log_upper_path,
+                                csv_idx, idx_round, valid_loss_round_mean, train_loss_round_mean,
+                                train_seed, cv_seed, parameters, param_name_list,
+                                param_value_list, param_name, profit=None):
 
     valid_loss_dict = {}
     train_loss_dict = {}
@@ -322,8 +324,14 @@ def save_boost_round_log_to_csv(model_name, boost_round_log_path, boost_round_lo
             print('Creating csv File of Boost Round Log...')
 
             with open(log_path + 'boost_round_log.csv', 'w') as f:
-                header = ['idx', 'time', 'lowest_round', 'lowest_valid_loss', 'lowest_train_loss', 'round',
-                          'valid_loss', 'train_loss', *param_name_list, 'train_seed', 'cv_seed', 'parameters']
+                if profit is None:
+                    header = ['idx', 'time', 'lowest_round', 'lowest_valid_loss',
+                              'lowest_train_loss', 'round', 'valid_loss', 'train_loss',
+                              *param_name_list, 'train_seed', 'cv_seed', 'parameters']
+                else:
+                    header = ['idx', 'time', 'profit', 'lowest_round', 'lowest_valid_loss',
+                              'lowest_train_loss', 'round', 'valid_loss', 'train_loss',
+                              *param_name_list, 'train_seed', 'cv_seed', 'parameters']
                 writer = csv.writer(f)
                 writer.writerow(header)
 
@@ -335,12 +343,22 @@ def save_boost_round_log_to_csv(model_name, boost_round_log_path, boost_round_lo
             for ii, (round_idx, (valid_loss, train_loss)) in enumerate(lowest_loss_dict.items()):
                 if ii == 0:
                     local_time = time.strftime('%Y/%m/%d-%H:%M:%S', time.localtime(time.time()))
-                    log = [csv_idx, local_time, lowest_round, lowest_valid_loss, lowest_train_loss, round_idx,
-                           valid_loss, train_loss, *param_value_list, train_seed, cv_seed, str(parameters)]
+                    if profit is None:
+                        log = [csv_idx, local_time, lowest_round, lowest_valid_loss,
+                               lowest_train_loss, round_idx, valid_loss, train_loss,
+                               *param_value_list, train_seed, cv_seed, str(parameters)]
+                    else:
+                        log = [csv_idx, local_time, profit, lowest_round, lowest_valid_loss,
+                               lowest_train_loss, round_idx, valid_loss, train_loss,
+                               *param_value_list, train_seed, cv_seed, str(parameters)]
                 else:
                     placeholder = [''] * len(param_value_list)
-                    log = [csv_idx, '', '', '', '', round_idx, valid_loss,
-                           train_loss, *placeholder, train_seed, cv_seed, '']
+                    if profit is None:
+                        log = [csv_idx, '', '', '', '', round_idx, valid_loss,
+                               train_loss, *placeholder, train_seed, cv_seed, '']
+                    else:
+                        log = [csv_idx, '', '', '', '', '', round_idx, valid_loss,
+                               train_loss, *placeholder, train_seed, cv_seed, '']
                 writer = csv.writer(f)
                 writer.writerow(log)
 
@@ -350,9 +368,10 @@ def save_boost_round_log_to_csv(model_name, boost_round_log_path, boost_round_lo
 
 
 # Save Boost Round Log with Global Validation to csv File
-def save_boost_round_log_gl_to_csv(model_name, boost_round_log_path, boost_round_log_upper_path, csv_idx, idx_round,
-                                   valid_loss_round_mean, train_loss_round_mean, global_valid_loss_round_mean,
-                                   train_seed, cv_seed, parameters, param_name_list, param_value_list, param_name):
+def save_boost_round_log_gl_to_csv(model_name, boost_round_log_path, boost_round_log_upper_path,
+                                   csv_idx, idx_round, valid_loss_round_mean, train_loss_round_mean,
+                                   global_valid_loss_round_mean, train_seed, cv_seed, parameters,
+                                   param_name_list, param_value_list, param_name, profit=None):
 
     gl_valid_loss_dict = {}
     valid_loss_dict = {}
@@ -381,9 +400,16 @@ def save_boost_round_log_gl_to_csv(model_name, boost_round_log_path, boost_round
             print('Creating csv File of Boost Round Log...')
 
             with open(log_path + 'boost_round_log.csv', 'w') as f:
-                header = ['idx', 'time', 'lowest_round', 'lowest_global_valid_loss', 'lowest_cv_valid_loss',
-                          'round', 'global_valid_loss', 'cv_valid_loss', 'cv_train_loss',
-                          *param_name_list, 'train_seed', 'cv_seed', 'parameters']
+                if profit is None:
+                    header = ['idx', 'time', 'lowest_round', 'lowest_global_valid_loss',
+                              'lowest_cv_valid_loss', 'round', 'global_valid_loss',
+                              'cv_valid_loss', 'cv_train_loss', *param_name_list,
+                              'train_seed', 'cv_seed', 'parameters']
+                else:
+                    header = ['idx', 'time', 'profit', 'lowest_round',
+                              'lowest_global_valid_loss', 'lowest_cv_valid_loss', 'round',
+                              'global_valid_loss', 'cv_valid_loss', 'cv_train_loss',
+                              *param_name_list, 'train_seed', 'cv_seed', 'parameters']
                 writer = csv.writer(f)
                 writer.writerow(header)
 
@@ -395,12 +421,22 @@ def save_boost_round_log_gl_to_csv(model_name, boost_round_log_path, boost_round
             for ii, (round_idx, (gl_valid_loss, valid_loss, train_loss)) in enumerate(lowest_loss_dict.items()):
                 if ii == 0:
                     local_time = time.strftime('%Y/%m/%d-%H:%M:%S', time.localtime(time.time()))
-                    log = [csv_idx, local_time, lowest_round, lowest_gl_valid_loss, lowest_valid_loss, round_idx,
-                           gl_valid_loss, valid_loss, train_loss, *param_value_list, train_seed, cv_seed, str(parameters)]
+                    if profit is None:
+                        log = [csv_idx, local_time, lowest_round, lowest_gl_valid_loss,
+                               lowest_valid_loss, round_idx, gl_valid_loss, valid_loss, train_loss,
+                               *param_value_list, train_seed, cv_seed, str(parameters)]
+                    else:
+                        log = [csv_idx, local_time, profit, lowest_round, lowest_gl_valid_loss,
+                               lowest_valid_loss, round_idx, gl_valid_loss, valid_loss, train_loss,
+                               *param_value_list, train_seed, cv_seed, str(parameters)]
                 else:
                     placeholder = [''] * len(param_value_list)
-                    log = [csv_idx, '', '', '', '', round_idx, gl_valid_loss,
-                           valid_loss, train_loss, *placeholder, train_seed, cv_seed, '']
+                    if profit is None:
+                        log = [csv_idx, '', '', '', '', round_idx, gl_valid_loss,
+                               valid_loss, train_loss, *placeholder, train_seed, cv_seed, '']
+                    else:
+                        log = [csv_idx, '', '', '', '', '', round_idx, gl_valid_loss,
+                               valid_loss, train_loss, *placeholder, train_seed, cv_seed, '']
                 writer = csv.writer(f)
                 writer.writerow(log)
 
@@ -409,30 +445,46 @@ def save_boost_round_log_gl_to_csv(model_name, boost_round_log_path, boost_round
     _save_log(boost_round_log_upper_path)
 
 
-def save_final_boost_round_log(boost_round_log_path, idx_round, train_loss_round_mean, valid_loss_round_mean):
+def save_final_boost_round_log(boost_round_log_path, idx_round, train_loss_round_mean,
+                               valid_loss_round_mean, profit=None):
 
     print('------------------------------------------------------')
     print('Saving Final Boost Round Log...')
 
-    df = pd.DataFrame({'idx': idx_round,
-                       'train_loss': train_loss_round_mean,
-                       'valid_loss': valid_loss_round_mean})
-    cols = ['idx', 'train_loss', 'valid_loss']
+    if profit is None:
+        df = pd.DataFrame({'idx': idx_round,
+                           'train_loss': train_loss_round_mean,
+                           'valid_loss': valid_loss_round_mean})
+        cols = ['idx', 'train_loss', 'valid_loss']
+    else:
+        df = pd.DataFrame({'idx': idx_round,
+                           'profit': profit,
+                           'train_loss': train_loss_round_mean,
+                           'valid_loss': valid_loss_round_mean})
+        cols = ['idx', 'profit', 'train_loss', 'valid_loss']
     df = df.loc[:, cols]
     df.to_csv(boost_round_log_path, sep=',', index=False)
 
 
 def save_final_boost_round_gl_log(boost_round_log_path, idx_round, train_loss_round_mean,
-                                  valid_loss_round_mean, global_valid_loss_round_mean):
+                                  valid_loss_round_mean, global_valid_loss_round_mean, profit=None):
 
     print('------------------------------------------------------')
     print('Saving Final Boost Round Log with Global Validation...')
 
-    df = pd.DataFrame({'idx': idx_round,
-                       'cv_train_loss': train_loss_round_mean,
-                       'cv_valid_loss': valid_loss_round_mean,
-                       'global_valid_loss:': global_valid_loss_round_mean})
-    cols = ['idx', 'cv_train_loss', 'cv_valid_loss', 'global_valid_loss:']
+    if profit is None:
+        df = pd.DataFrame({'idx': idx_round,
+                           'cv_train_loss': train_loss_round_mean,
+                           'cv_valid_loss': valid_loss_round_mean,
+                           'global_valid_loss:': global_valid_loss_round_mean})
+        cols = ['idx', 'cv_train_loss', 'cv_valid_loss', 'global_valid_loss:']
+    else:
+        df = pd.DataFrame({'idx': idx_round,
+                           'profit': profit,
+                           'cv_train_loss': train_loss_round_mean,
+                           'cv_valid_loss': valid_loss_round_mean,
+                           'global_valid_loss:': global_valid_loss_round_mean})
+        cols = ['idx', 'profit', 'cv_train_loss', 'cv_valid_loss', 'global_valid_loss:']
     df = df.loc[:, cols]
     print(df)
     df.to_csv(boost_round_log_path, sep=',', index=False)
@@ -618,13 +670,17 @@ def print_global_valid_loss_and_acc(prob_global_valid, y_global_valid, w_global_
 
 
 # Print Total Losses
-def print_total_loss(loss_train_mean, loss_valid_mean, loss_train_w_mean, loss_valid_w_mean):
+def print_total_loss(loss_train_mean, loss_valid_mean, loss_train_w_mean,
+                     loss_valid_w_mean, profit=None):
 
     print('------------------------------------------------------')
     print('Total Train LogLoss: {:.8f}\n'.format(loss_train_mean),
           'Total Validation LogLoss: {:.8f}\n'.format(loss_valid_mean),
           'Total Train LogLoss with Weight: {:.8f}\n'.format(loss_train_w_mean),
           'Total Validation LogLoss with Weight: {:.8f}'.format(loss_valid_w_mean))
+    if profit is not None:
+        print('------------------------------------------------------')
+        print('Test Profit: {:.8f}%\n'.format(profit*100))
 
 
 # Print Total Loss of Global Validation Set
@@ -981,6 +1037,29 @@ def get_idx_category(x_train, use_multi_group):
         idx_category = None
 
     return idx_category
+
+
+# Get Cross Validation Arguments
+def get_cv_args(cv_args, append_info):
+
+    cv_args_copy = copy.deepcopy(cv_args)
+    if 'n_valid' in cv_args:
+        n_valid = cv_args_copy['n_valid']
+    elif 'valid_rate' in cv_args:
+        n_valid = cv_args_copy['valid_rate']
+    else:
+        n_valid = ''
+    n_cv = cv_args_copy['n_cv']
+    n_era = cv_args_copy['n_era']
+    cv_seed = cv_args_copy['cv_seed']
+
+    # Append Information
+    if append_info is None:
+        append_info = 'v-' + str(n_valid) + '_c-' + str(n_cv) + '_e-' + str(n_era)
+        if 'window_size' in cv_args_copy:
+            append_info += '_w-' + str(cv_args_copy['window_size'])
+
+    return cv_args_copy, n_valid, n_cv, n_era, cv_seed
 
 
 # Get Simple Parameter's Name

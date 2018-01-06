@@ -319,9 +319,8 @@ class DeepNeuralNetworks(ModelBase):
               train_seed=None, cv_args=None, parameters=None, show_importance=False, show_accuracy=False,
               save_cv_pred=True, save_cv_prob_train=False, save_final_pred=True, save_final_prob_train=False,
               save_csv_log=True, csv_idx=None, prescale=False, postscale=False, use_global_valid=False,
-              return_prob_test=False, mode=None, param_name_list=None, param_value_list=None,
-              use_custom_obj=False, use_scale_pos_weight=False, file_name_params=None, append_info=None,
-              f_profit=None, f_profit_args=None):
+              return_prob_test=False, mode=None, param_name_list=None, param_value_list=None, strategy_args=None,
+              use_custom_obj=False, use_scale_pos_weight=False, file_name_params=None, append_info=None):
 
         # Check if directories exit or not
         utils.check_dir_model(pred_path, loss_log_path)
@@ -329,16 +328,8 @@ class DeepNeuralNetworks(ModelBase):
         # Global Validation
         self.use_global_valid = use_global_valid
 
-        cv_args_copy = copy.deepcopy(cv_args)
-        if 'n_valid' in cv_args:
-            n_valid = cv_args_copy['n_valid']
-        elif 'valid_rate' in cv_args:
-            n_valid = cv_args_copy['valid_rate']
-        else:
-            n_valid = ''
-        n_cv = cv_args_copy['n_cv']
-        n_era = cv_args_copy['n_era']
-        cv_seed = cv_args_copy['cv_seed']
+        # Cross Validation Arguments
+        cv_args_copy, n_valid, n_cv, n_era, cv_seed = utils.get_cv_args(cv_args, append_info)
 
         # Append Information
         if append_info is None:
@@ -537,12 +528,10 @@ class DeepNeuralNetworks(ModelBase):
                                       loss_train_w_total, loss_valid_w_total, weights=cv_weights)
 
             # Calculate Profit
-            if f_profit is not None:
-                pred_profit = self.pct_test.drop(['index'], axis=1)
-                pred_profit['prob'] = prob_test_mean
-                profit = f_profit(pred_profit, **f_profit_args)
-            else:
-                profit = None
+            profit = self.apply_strategy(
+                strategy_args, prob_test_mean, mode, csv_log_path,
+                boost_round_log_path, csv_idx, train_seed, cv_seed, param_name_list,
+                param_value_list, parameters, file_name_params, append_info)
 
             # Save Logs of num_boost_round
             if mode == 'auto_train_boost_round':
@@ -557,7 +546,7 @@ class DeepNeuralNetworks(ModelBase):
                     utils.calculate_boost_round_means(train_loss_round_total, valid_loss_round_total, weights=cv_weights)
                 self.save_boost_round_log(boost_round_log_path, idx_round, train_loss_round_mean, valid_loss_round_mean,
                                           train_seed, cv_seed, csv_idx, parameters, param_name_list, param_value_list,
-                                          append_info=append_info)
+                                          append_info=append_info, profit=profit)
 
             # Save Final Result
             if save_final_pred:
