@@ -266,26 +266,22 @@ class Training(object):
             Training Arguments
         """
         train_args = {'prescale': False,
-                      'postscale': True,
+                      'postscale': False,
                       'use_scale_pos_weight': False,
                       'use_global_valid': False,
                       'use_custom_obj': False,
                       'show_importance': False,
-                      'show_accuracy': False,
+                      'show_accuracy': True,
                       'save_final_pred': True,
                       'save_final_prob_train': False,
-                      'save_cv_pred': False,
+                      'save_cv_pred': True,
                       'save_cv_prob_train': False,
                       'save_csv_log': True,
-                      'append_info': 'forward_window_postscale'}
+                      'append_info': 'forward_window'}
 
         """
             Cross Validation Arguments
         """
-        # cv_args = {'n_valid': 4,
-        #            'n_cv': 20,
-        #            'n_era': 20}
-
         cv_args = self.get_cv_args('xgb_fw')
 
         """
