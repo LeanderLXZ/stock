@@ -192,7 +192,7 @@ class Training(object):
             """
                 XGB Forward Window
             """
-            cv_args = {'valid_rate': 0.1,
+            cv_args = {'ensemble': True,
                        'n_cv': 12,
                        'n_era': 78,
                        'cv_generator': CrossValidation.forward_window,
