@@ -320,7 +320,8 @@ class DeepNeuralNetworks(ModelBase):
               save_cv_pred=True, save_cv_prob_train=False, save_final_pred=True, save_final_prob_train=False,
               save_csv_log=True, csv_idx=None, prescale=False, postscale=False, use_global_valid=False,
               return_prob_test=False, mode=None, param_name_list=None, param_value_list=None,
-              use_custom_obj=False, use_scale_pos_weight=False, file_name_params=None, append_info=None):
+              use_custom_obj=False, use_scale_pos_weight=False, file_name_params=None, append_info=None,
+              f_profit=None, f_profit_args=None):
 
         # Check if directories exit or not
         utils.check_dir_model(pred_path, loss_log_path)
@@ -535,6 +536,14 @@ class DeepNeuralNetworks(ModelBase):
                 utils.calculate_means(prob_test_total, prob_train_total, loss_train_total, loss_valid_total,
                                       loss_train_w_total, loss_valid_w_total, weights=cv_weights)
 
+            # Calculate Profit
+            if f_profit is not None:
+                pred_profit = self.pct_test.drop(['index'], axis=1)
+                pred_profit['prob'] = prob_test_mean
+                profit = f_profit(pred_profit, **f_profit_args)
+            else:
+                profit = None
+
             # Save Logs of num_boost_round
             if mode == 'auto_train_boost_round':
                 l = len(train_loss_round_total[0])
@@ -552,9 +561,9 @@ class DeepNeuralNetworks(ModelBase):
 
             # Save Final Result
             if save_final_pred:
-                self.save_final_pred(mode, save_final_pred, prob_test_mean, pred_path,
-                                     parameters, csv_idx, train_seed, cv_seed, boost_round_log_path,
-                                     param_name_list, param_value_list, file_name_params=None, append_info=append_info)
+                self.save_final_pred(mode, prob_test_mean, pred_path, parameters, csv_idx, train_seed,
+                                     cv_seed, boost_round_log_path, param_name_list, param_value_list,
+                                     file_name_params=None, append_info=append_info)
 
             # Save Final prob_train
             if save_final_prob_train:
@@ -589,7 +598,7 @@ class DeepNeuralNetworks(ModelBase):
                                       loss_valid_w_mean, acc_train, train_seed, cv_seed, n_valid, n_cv, parameters,
                                       boost_round_log_path=boost_round_log_path, file_name_params=file_name_params,
                                       append_info=append_info, loss_global_valid=loss_global_valid_w_mean,
-                                      acc_global_valid=acc_total_global_valid)
+                                      acc_global_valid=acc_total_global_valid, profit=profit)
 
             # Save Loss Log to csv File
             if save_csv_log:
@@ -597,7 +606,7 @@ class DeepNeuralNetworks(ModelBase):
                     self.save_csv_log(mode, csv_log_path, param_name_list, param_value_list, csv_idx,
                                       loss_train_w_mean, loss_valid_w_mean, acc_train, train_seed,
                                       cv_seed, n_valid, n_cv, parameters, file_name_params=file_name_params,
-                                      append_info=append_info)
+                                      append_info=append_info, profit=profit)
 
             # Return Final Result
             if return_prob_test:

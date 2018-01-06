@@ -155,7 +155,7 @@ def save_final_loss_log(log_path, parameters, n_valid, n_cv, loss_train_mean,
 
 # Save Loss Log to csv File
 def save_final_loss_log_to_csv(idx, log_path, loss_train_w_mean, loss_valid_w_mean, acc_train,
-                               train_seed, cv_seed, n_valid, n_cv, parameters):
+                               train_seed, cv_seed, n_valid, n_cv, parameters, profit=None):
 
     if not os.path.isfile(log_path + 'csv_log.csv'):
 
@@ -163,8 +163,12 @@ def save_final_loss_log_to_csv(idx, log_path, loss_train_w_mean, loss_valid_w_me
         print('Creating csv File of Final Loss Log...')
 
         with open(log_path + 'csv_log.csv', 'w') as f:
-            header = ['id', 'time', 'loss_train', 'loss_valid', 'train_accuracy',
-                      'train_seed', 'cv_seed', 'n_valid', 'n_cv', 'parameters']
+            if profit is None:
+                header = ['id', 'time', 'loss_train', 'loss_valid', 'train_accuracy',
+                          'train_seed', 'cv_seed', 'n_valid', 'n_cv', 'parameters']
+            else:
+                header = ['id', 'time', 'profit', 'loss_train', 'loss_valid', 'train_accuracy',
+                          'train_seed', 'cv_seed', 'n_valid', 'n_cv', 'parameters']
             writer = csv.writer(f)
             writer.writerow(header)
 
@@ -174,8 +178,12 @@ def save_final_loss_log_to_csv(idx, log_path, loss_train_w_mean, loss_valid_w_me
         print('Saving Final Losses to csv File...')
 
         local_time = time.strftime('%Y/%m/%d-%H:%M:%S', time.localtime(time.time()))
-        log = [idx, local_time, loss_train_w_mean, loss_valid_w_mean, acc_train,
-               train_seed, cv_seed, n_valid, n_cv, str(parameters)]
+        if profit is None:
+            log = [idx, local_time, loss_train_w_mean, loss_valid_w_mean, acc_train,
+                   train_seed, cv_seed, n_valid, n_cv, str(parameters)]
+        else:
+            log = [idx, local_time, profit, loss_train_w_mean, loss_valid_w_mean, acc_train,
+                   train_seed, cv_seed, n_valid, n_cv, str(parameters)]
         writer = csv.writer(f)
         writer.writerow(log)
 
@@ -183,15 +191,19 @@ def save_final_loss_log_to_csv(idx, log_path, loss_train_w_mean, loss_valid_w_me
 # Save Loss Log with Global Validation to csv File
 def save_log_with_glv_to_csv(idx, log_path, loss_train_w_mean, loss_valid_w_mean, acc_train,
                              train_seed, loss_global_valid_w_mean, acc_total_global_valid,
-                             cv_seed, n_valid, n_cv, parameters):
+                             cv_seed, n_valid, n_cv, parameters, profit=None):
 
     if not os.path.isfile(log_path + 'csv_log.csv'):
         print('------------------------------------------------------')
         print('Creating csv File of Final Loss Log with Global Validation...')
 
         with open(log_path + 'csv_log.csv', 'w') as f:
-            header = ['id', 'time', 'loss_train', 'valid_loss', 'global_valid_loss', 'train_accuracy',
-                      'global_valid_accuracy', 'train_seed', 'cv_seed', 'n_valid', 'n_cv', 'parameters']
+            if profit is None:
+                header = ['id', 'time', 'loss_train', 'valid_loss', 'global_valid_loss', 'train_accuracy',
+                          'global_valid_accuracy', 'train_seed', 'cv_seed', 'n_valid', 'n_cv', 'parameters']
+            else:
+                header = ['id', 'time', 'profit', 'loss_train', 'valid_loss', 'global_valid_loss', 'train_accuracy',
+                          'global_valid_accuracy', 'train_seed', 'cv_seed', 'n_valid', 'n_cv', 'parameters']
             writer = csv.writer(f)
             writer.writerow(header)
 
@@ -200,23 +212,31 @@ def save_log_with_glv_to_csv(idx, log_path, loss_train_w_mean, loss_valid_w_mean
         print('Saving Final Losses with Global Validation to csv File...')
 
         local_time = time.strftime('%Y/%m/%d-%H:%M:%S', time.localtime(time.time()))
-        log = [idx, local_time, loss_train_w_mean, loss_valid_w_mean, loss_global_valid_w_mean, acc_train,
-               acc_total_global_valid, train_seed, cv_seed, n_valid, n_cv, str(parameters)]
+        if profit is None:
+            log = [idx, local_time, loss_train_w_mean, loss_valid_w_mean, loss_global_valid_w_mean, acc_train,
+                   acc_total_global_valid, train_seed, cv_seed, n_valid, n_cv, str(parameters)]
+        else:
+            log = [idx, local_time, profit, loss_train_w_mean, loss_valid_w_mean, loss_global_valid_w_mean,
+                   acc_train, acc_total_global_valid, train_seed, cv_seed, n_valid, n_cv, str(parameters)]
         writer = csv.writer(f)
         writer.writerow(log)
 
 
 # Save Grid Search Log to csv File
-def save_grid_search_log_to_csv(idx, log_path, loss_train_w_mean, loss_valid_w_mean, acc_train,
-                                train_seed, cv_seed, n_valid, n_cv, parameters, param_name_list, param_value_list):
+def save_grid_search_log_to_csv(idx, log_path, loss_train_w_mean, loss_valid_w_mean, acc_train, train_seed, cv_seed,
+                                n_valid, n_cv, parameters, param_name_list, param_value_list, profit=None):
 
     if not os.path.isfile(log_path + 'csv_log.csv'):
         print('------------------------------------------------------')
         print('Creating csv File of Final Loss Log...')
 
         with open(log_path + 'csv_log.csv', 'w') as f:
-            header = ['id', 'time', 'loss_train', 'loss_valid', 'train_accuracy',
-                      *param_name_list, 'train_seed', 'cv_seed', 'n_valid', 'n_cv', 'parameters']
+            if profit is None:
+                header = ['id', 'time', 'loss_train', 'loss_valid', 'train_accuracy',
+                          *param_name_list, 'train_seed', 'cv_seed', 'n_valid', 'n_cv', 'parameters']
+            else:
+                header = ['id', 'time', 'profit', 'loss_train', 'loss_valid', 'train_accuracy',
+                          *param_name_list, 'train_seed', 'cv_seed', 'n_valid', 'n_cv', 'parameters']
             writer = csv.writer(f)
             writer.writerow(header)
 
@@ -225,25 +245,34 @@ def save_grid_search_log_to_csv(idx, log_path, loss_train_w_mean, loss_valid_w_m
         print('Saving Final Losses to csv File...')
 
         local_time = time.strftime('%Y/%m/%d-%H:%M:%S', time.localtime(time.time()))
-        log = [idx, local_time, loss_train_w_mean, loss_valid_w_mean, acc_train,
-               *param_value_list, train_seed, cv_seed, n_valid, n_cv, str(parameters)]
+        if profit is None:
+            log = [idx, local_time, loss_train_w_mean, loss_valid_w_mean, acc_train,
+                   *param_value_list, train_seed, cv_seed, n_valid, n_cv, str(parameters)]
+        else:
+            log = [idx, local_time, profit, loss_train_w_mean, loss_valid_w_mean, acc_train,
+                   *param_value_list, train_seed, cv_seed, n_valid, n_cv, str(parameters)]
         writer = csv.writer(f)
         writer.writerow(log)
 
 
 # Save Loss Log with Global Validation to csv File
 def save_grid_search_log_with_glv_to_csv(idx, log_path, loss_train_w_mean, loss_valid_w_mean, acc_train,
-                                         train_seed, loss_global_valid_w_mean, acc_total_global_valid,
-                                         cv_seed, n_valid, n_cv, parameters, param_name_list, param_value_list):
+                                         train_seed, loss_global_valid_w_mean, acc_total_global_valid, cv_seed,
+                                         n_valid, n_cv, parameters, param_name_list, param_value_list, profit=None):
 
     if not os.path.isfile(log_path + 'csv_log.csv'):
         print('------------------------------------------------------')
         print('Creating csv File of Final Loss Log with Global Validation...')
 
         with open(log_path + 'csv_log.csv', 'w') as f:
-            header = ['id', 'time', 'loss_train', 'valid_loss', 'global_valid_loss',
-                      'train_accuracy', 'global_valid_accuracy', *param_name_list, 'train_seed',
-                      'cv_seed', 'n_valid', 'n_cv', 'parameters']
+            if profit is None:
+                header = ['id', 'time', 'loss_train', 'valid_loss', 'global_valid_loss',
+                          'train_accuracy', 'global_valid_accuracy', *param_name_list, 'train_seed',
+                          'cv_seed', 'n_valid', 'n_cv', 'parameters']
+            else:
+                header = ['id', 'time', 'profit', 'loss_train', 'valid_loss', 'global_valid_loss',
+                          'train_accuracy', 'global_valid_accuracy', *param_name_list, 'train_seed',
+                          'cv_seed', 'n_valid', 'n_cv', 'parameters']
             writer = csv.writer(f)
             writer.writerow(header)
 
@@ -252,8 +281,12 @@ def save_grid_search_log_with_glv_to_csv(idx, log_path, loss_train_w_mean, loss_
         print('Saving Final Losses with Global Validation to csv File...')
 
         local_time = time.strftime('%Y/%m/%d-%H:%M:%S', time.localtime(time.time()))
-        log = [idx, local_time, loss_train_w_mean, loss_valid_w_mean, loss_global_valid_w_mean, acc_train,
-               acc_total_global_valid, *param_value_list, train_seed, cv_seed, n_valid, n_cv, str(parameters)]
+        if profit is None:
+            log = [idx, local_time, loss_train_w_mean, loss_valid_w_mean, loss_global_valid_w_mean, acc_train,
+                   acc_total_global_valid, *param_value_list, train_seed, cv_seed, n_valid, n_cv, str(parameters)]
+        else:
+            log = [idx, local_time, profit, loss_train_w_mean, loss_valid_w_mean, loss_global_valid_w_mean, acc_train,
+                   acc_total_global_valid, *param_value_list, train_seed, cv_seed, n_valid, n_cv, str(parameters)]
         writer = csv.writer(f)
         writer.writerow(log)
 
