@@ -693,6 +693,16 @@ class ModelBase(object):
             utils.calculate_means(prob_test_total, prob_train_total, loss_train_total, loss_valid_total,
                                   loss_train_w_total, loss_valid_w_total, weights=cv_weights)
 
+        # Save 'num_boost_round'
+        if self.model_name in ['xgb', 'lgb']:
+            parameters['num_boost_round'] = self.num_boost_round
+
+        # Calculate Profit
+        profit = self.apply_strategy(
+            strategy_args, prob_test_mean, mode, csv_log_path,
+            boost_round_log_path, csv_idx, train_seed, cv_seed, param_name_list,
+            param_value_list, parameters, file_name_params, append_info)
+
         # Save Logs of num_boost_round
         if mode == 'auto_train_boost_round':
             if use_global_valid:
@@ -714,22 +724,12 @@ class ModelBase(object):
                     valid_loss_round_mean, train_seed, cv_seed, csv_idx, parameters,
                     param_name_list, param_value_list, append_info=append_info, profit=profit)
 
-        # Save 'num_boost_round'
-        if self.model_name in ['xgb', 'lgb']:
-            parameters['num_boost_round'] = self.num_boost_round
-
         # Save Final Result
         if save_final_pred:
             self.save_final_pred(
                 mode, prob_test_mean, pred_path, parameters, csv_idx, train_seed,
                 cv_seed, boost_round_log_path, param_name_list, param_value_list,
                 file_name_params=file_name_params, append_info=append_info)
-
-        # Calculate Profit
-        profit = self.apply_strategy(
-            strategy_args, prob_test_mean, mode, csv_log_path,
-            boost_round_log_path, csv_idx, train_seed, cv_seed, param_name_list,
-            param_value_list, parameters, file_name_params, append_info)
 
         # Save Final prob_train
         if save_final_prob_train:
