@@ -35,11 +35,11 @@ class Strategy(object):
 
         if save_image:
             plt.figure(figsize=(12, 6))
-            plt.plot(result)
+            plt.plot(result, color='red')
             plt.savefig(save_path + 'reserve.jpg')
             plt.close('all')
             plt.figure(figsize=(12, 6))
-            plt.plot(day_profit_array)
+            plt.plot(day_profit_array, color='blue')
             plt.savefig(save_path + 'day_profit.jpg')
 
         return final_profit
