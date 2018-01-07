@@ -17,7 +17,7 @@ class Strategy(object):
 
         prediction = pred.copy()
         day_profit = prediction.groupby('date').apply(
-            lambda x: x.sort_values('prob', ascending=ascending)[:buy_count]['pct_change'].mean())
+            lambda x: x.sort_values('prob', ascending=ascending)[:buy_count]['pct'].mean())
         day_profit -= fee
         day_profit_array = day_profit.as_matrix()
 
