@@ -31,7 +31,7 @@ class Strategy(object):
         day_profit_array = np.concatenate((day_profit_array.to_list(), [0.]))
 
         if save_result:
-            df = pd.DataFrame({'reserve': result, 'day_profit': np.append(day_profit_array, np.array())})
+            df = pd.DataFrame({'reserve': result, 'day_profit': day_profit_array})
             df.to_csv(save_path + 'day_profit.csv', sep=',', index=True)
 
         if save_image:
@@ -39,7 +39,7 @@ class Strategy(object):
             plt.plot(result)
             plt.savefig(save_path + 'reserve.jpg')
             plt.figure(figsize=(12, 6))
-            plt.plot(day_profit)
+            plt.plot(day_profit_array)
             plt.savefig(save_path + 'day_profit.jpg')
 
         return final_profit
