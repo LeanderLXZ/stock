@@ -28,7 +28,7 @@ class Strategy(object):
 
         final_profit = result[-1]-1
 
-        day_profit_array = np.concatenate((day_profit_array.to_list(), [0.]))
+        day_profit_array = np.concatenate((day_profit_array.tolist(), [0.]))
 
         if save_result:
             df = pd.DataFrame({'reserve': result, 'day_profit': day_profit_array})
