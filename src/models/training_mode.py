@@ -139,10 +139,10 @@ class TrainingMode(object):
                     n_value *= len(parameter_grid[i][1])
 
                 param_value = np.zeros((n_param, n_value)).tolist()
-                value_list = []
-                value_col = 0
                 global value_list
                 global value_col
+                value_list = []
+                value_col = 0
 
                 def generate_value_matrix_(idx_param):
                     idx_param_next = idx_param + 1
