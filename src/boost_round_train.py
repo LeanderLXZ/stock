@@ -297,7 +297,7 @@ class Training(object):
         """
         from models.cross_validation import CrossValidation
         cv_args = {'ensemble': True,
-                   'n_cv': 3,
+                   'n_cv': 12,
                    'n_era': 90,
                    'cv_generator': CrossValidation.forward_window,
                    'window_size': 40}
@@ -338,11 +338,11 @@ class Training(object):
                    #  ['colsample_bytree', (0.86, 0.88, 0.9)],
                    #  ['colsample_bylevel', (0.7, 0.75, 0.8)]
                    #  ]
-                   [['learning_rate', [0.001]]]
+                   [['learning_rate', [0.003]]]
                    ]
         train_seed_list = [999]
         cv_seed_list = [95]
-        TM.auto_train_boost_round('xgb', num_boost_round=65, n_epoch=1, full_grid_search=True,
+        TM.auto_train_boost_round('xgb', num_boost_round=100, n_epoch=1, full_grid_search=True,
                                   use_multi_group=False, train_seed_list=train_seed_list, cv_seed_list=cv_seed_list,
                                   base_parameters=base_parameters, parameter_grid_list=pg_list, save_final_pred=False,
                                   reduced_feature_list=reduced_feature_list, train_args=train_args, cv_args=cv_args)

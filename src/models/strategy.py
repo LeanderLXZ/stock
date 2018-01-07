@@ -34,8 +34,11 @@ class Strategy(object):
             df.to_csv(save_path + 'day_profit.csv', sep=',', index=True)
 
         if save_image:
+            plt.figure(figsize=(12, 6))
             plt.plot(result)
             plt.savefig(save_path + 'reserve.jpg')
+            plt.close('all')
+            plt.figure(figsize=(12, 6))
             plt.plot(day_profit_array)
             plt.savefig(save_path + 'day_profit.jpg')
 
