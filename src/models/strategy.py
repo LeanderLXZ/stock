@@ -28,8 +28,10 @@ class Strategy(object):
 
         final_profit = result[-1]-1
 
+        day_profit_array = np.concatenate((day_profit_array.to_list(), [0.]))
+
         if save_result:
-            df = pd.DataFrame({'reserve': result, 'day_profit': day_profit_array})
+            df = pd.DataFrame({'reserve': result, 'day_profit': np.append(day_profit_array, np.array())})
             df.to_csv(save_path + 'day_profit.csv', sep=',', index=True)
 
         if save_image:
