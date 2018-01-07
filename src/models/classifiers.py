@@ -470,7 +470,7 @@ class ModelBase(object):
             strategy_args_copy.pop('f_strategy')
             pred_s = self.pct_test.drop(['index'], axis=1)
             pred_s['prob'] = prob_test_mean
-            profit = f_strategy(pred_s, **strategy_args_copy, profit_path=profit_path)
+            profit = f_strategy(pred_s, **strategy_args_copy, save_path=profit_path)
         else:
             profit = None
 
