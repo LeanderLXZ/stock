@@ -295,7 +295,13 @@ class Training(object):
         """
             Cross Validation Arguments
         """
-        cv_args = self.get_cv_args('xgb_fw')
+        from models.cross_validation import CrossValidation
+        cv_args = {'ensemble': True,
+                   'n_cv': 3,
+                   'n_era': 90,
+                   'cv_generator': CrossValidation.forward_window,
+                   'window_size': 40}
+        # cv_args = self.get_cv_args('xgb_fw')
 
         """
             Reduced Features
