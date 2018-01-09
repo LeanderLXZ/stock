@@ -454,7 +454,7 @@ class DataPreProcess(object):
         self.x_test = np.array(self.x_test, dtype=np.float64)
         self.y_test = np.array(self.y_test, dtype=np.float64)
         self.w_test = np.array(self.w_test, dtype=np.float64)
-        self.e_test = np.array(self.e_test, dtype=np.float64)
+        self.e_test = np.array(self.e_test, dtype=int)
         self.id_test = np.array(self.id_test, dtype=int)
         if self.use_code_id:
             self.code_id_train = np.array(self.code_id_train, dtype=int)
