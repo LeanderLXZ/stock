@@ -35,4 +35,6 @@ if __name__ == '__main__':
                      'save_result': True,
                      'save_image': True}
 
+    utils.check_dir(['../results/profit/'])
+
     calculate_profit(strategy_args, test_path, profit_path)
