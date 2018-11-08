@@ -25,4 +25,3 @@
 *.html
 *.txt
 *.tsv
-/src/models/classifiers.py
